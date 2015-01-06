@@ -1,11 +1,12 @@
+# These are test functions only, used for consistent centrality comparisons.
 using Graphs
-type Edge
+immutable REdge
     src::Integer
     dst::Integer
 end
 
-function randgraph(nv::Integer, ne::Integer=10*nv, f::AbstractString="graph-$nv-$ne.csv")
-    edges = Edge[]
+function randgraph(nv::Integer, ne::Integer=int(0.2*(nv^2)), f::AbstractString="graph-$nv-$ne.csv")
+    redges = REdge[]
     f = open(f,"w")
     line = string(nv,"\n")
     write(f,line)
@@ -13,11 +14,12 @@ function randgraph(nv::Integer, ne::Integer=10*nv, f::AbstractString="graph-$nv-
     while i <= ne
         source = rand(1:nv)
         dest = rand(1:nv)
-        e = Edge(source, dest)
-        if (source != dest) && !(in(e, edges))
+        e = REdge(source, dest)
+        if (source != dest) && !(in(e,redges))
             i+= 1
             line = string(source,", ", dest,"\n")
             write(f,line)
+            push!(redges,e)
         end
     end
     close(f)
@@ -37,4 +39,14 @@ function readgraph(f::AbstractString)
     end
     close(f)
     return g
+end
+
+function readcentrality(f::AbstractString)
+    f = open(f,"r")
+    c = Float64[]
+    while !eof(f)
+        line = chomp(readline(f))
+        push!(c, float(line))
+    end
+    return c
 end

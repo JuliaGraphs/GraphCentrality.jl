@@ -5,8 +5,12 @@ module Centrality
 
     export
         degree_centrality, in_degree_centrality, out_degree_centrality,
-        betweenness_centrality
+        betweenness_centrality,
+
+        randgraph, readgraph
+
     include("measures/degree.jl")
     include("measures/betweenness.jl")
+    include("randgraphs.jl")
 
 end # module
