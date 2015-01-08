@@ -21,7 +21,7 @@ function betweenness_centrality{V}(
         if length(weights) == 0
             S, P, σ = _single_source_shortest_path_basic(g, s)
         else
-            error("Not yet implemented")
+            S, P, σ = _single_source_dijkstra_path_basic(g, s, weights)
         end
         if endpoints            # 120
             betweenness = _accumulate_endpoints(betweenness, S, P, σ, s)
@@ -88,15 +88,39 @@ function _single_source_dijkstra_path_basic{V}(g::AbstractGraph{V}, s::V, weight
         P[v] = V[]
         σ[v] = 0.0
     end
-    D = Dict{V, Int}()
+    D = Dict{V, Float64}()
     σ[s] = 1.0
 
-    D[s] = 0
     seen = Dict{V,Float64}()
-    count = 0
-    Q = V[s]
-    # INCOMPLETE
+    seen[s] = 0
+    c = 0 # 253
+    Q = (Float64, Int, V, V)[]
+    push!(Q, (0.0, c, s, s)); c += 1
+    while length(Q) > 0
+        (dist, _, pred, v) = pop!(Q)
+        if (v in keys(D)) # 258
+            continue
+        end
+        σ[v] += σ[pred]
+        push!(S,v)
+        D[v] = dist
+        for w in out_neighbors(v,g)
+            wi = vertex_index(w,g)
+            vw_dist = dist + weights[wi] # 264
+            if !(w in keys(D)) && ((!(w in keys(seen))) || (vw_dist < seen[w]))
+                seen[w] = vw_dist
+                push!(Q, (vw_dist, c, v, w)); c += 1
+                σ[w] = 0.0
+                P[w] = [v]
+            elseif vw_dist == seen[w] # 270
+                σ[w] += σ[v]
+                push!(P[w],v)
+            end
+        end
+    end
+    return S, P, σ
 end
+
 
 function _accumulate_basic{V}(
     betweenness::Dict{V, Float64},

@@ -3,8 +3,9 @@
 [![Build Status](https://travis-ci.org/sbromberger/Centrality.jl.svg?branch=master)](https://travis-ci.org/sbromberger/Centrality.jl)
 
 ##TODO
-- [ ] Finish betweenness_centrality with dijkstra
+- [X] Finish betweenness_centrality with dijkstra
 - [ ] Optimize code
+- [ ] TESTS!
 - [ ] New centrality measures:
  - [ ] Closeness
  - [ ] Load
