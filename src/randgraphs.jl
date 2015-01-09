@@ -6,7 +6,7 @@ immutable REdge
 end
 
 function randgraph(nv::Integer, ne::Integer=int(0.2*(nv^2)), f::AbstractString="graph-$nv-$ne.csv")
-    redges = REdge[]
+    redges = Set(REdge[])
     f = open(f,"w")
     line = string(nv,"\n")
     write(f,line)

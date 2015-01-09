@@ -129,22 +129,42 @@ function _accumulate_basic{V}(
     σ::Dict{V, Float64},
     s::V
     )
+    disps = zeros(Float64,length(σ))
+    dispp = zeros(Int,length(P))
+    for (k,v) in σ
+        disps[k] = v
+    end
+    for (k,v) in P
+        if length(v) > 0
+            dispp[k] = v[1]
+        end
+    end
 
+    println("S = $S, P = $P, σ = $disps, s = $s")
     δ = Dict{V, Float64}()
     for i in S
         δ[i] = 0.0
     end
 
+
     while length(S) > 0
         w = pop!(S) # 279
         coeff = (1.0 + δ[w]) / σ[w]
+        # println("coeff of $w = $coeff, δ[w] = $(δ[w])")
+        # println("*** P[w] = P[$w] = $(P[w])")
         for v in P[w]
             δ[v] += (σ[v] * coeff)
+            # println("setting δ[$v] to $(δ[v])")
         end
         if w != s
             betweenness[w] += δ[w]
         end
     end
+    byvind = zeros(length(betweenness))
+    for (k,v) in betweenness
+        byvind[k] = v
+    end
+    println("betweenness = $byvind")
     return betweenness
 end
 
