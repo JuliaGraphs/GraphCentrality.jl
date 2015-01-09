@@ -12,7 +12,6 @@ module Centrality
     include("dijkstra_pred.jl")
     include("measures/degree.jl")
     include("measures/betweenness.jl")
-    include("measures/betweenness2.jl")
     include("randgraphs.jl")
 
 end # module

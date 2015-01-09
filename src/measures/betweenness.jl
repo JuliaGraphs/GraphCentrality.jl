@@ -1,6 +1,3 @@
-using DataStructures
-using StatsBase
-
 function betweenness_centrality{V}(
     g::AbstractGraph{V},
     k::Integer=0;
@@ -19,14 +16,14 @@ function betweenness_centrality{V}(
     end
     for s in nodes
         if length(weights) == 0
-            S, P, σ = _single_source_shortest_path_basic(g, s)
+            state = dijkstra_predecessor_and_distance(g, s)
         else
-            S, P, σ = _single_source_dijkstra_path_basic(g, s, weights)
+            state = dijkstra_predecessor_and_distance(g, weights, s)
         end
         if endpoints            # 120
-            betweenness = _accumulate_endpoints(betweenness, S, P, σ, s)
+            betweenness = _accumulate_endpoints(betweenness, state, g, vertex_index(s,g))
         else
-            betweenness = _accumulate_basic(betweenness, S, P, σ, s)
+            betweenness = _accumulate_basic(betweenness, state, g, vertex_index(s,g))
         end
     end
     betweenness = _rescale(betweenness, num_vertices(g),
@@ -42,154 +39,75 @@ function betweenness_centrality{V}(
 end
 
 
-
-
-function _single_source_shortest_path_basic{V}(g::AbstractGraph{V}, s::V)
-    S = V[]
-
-    P = Dict{V, Vector{V}}()
-    σ = Dict{V, Float64}()
-    for v in vertices(g)
-        P[v] = V[]
-        σ[v] = 0.0
-    end
-    D = Dict{V, Int}()  #222
-    σ[s] = 1.0
-
-    D[s] = 0
-
-    Q = V[s] # 225
-
-    while length(Q) > 0
-        v = shift!(Q)   #227
-        push!(S,v)  #228
-        Dv = D[v]
-        σv = σ[v]
-        for w in out_neighbors(v,g)
-            if !(w in keys(D))
-                push!(Q,w)
-                D[w] = Dv + 1   # 234
-            end
-            if D[w] == Dv + 1
-                σ[w] += σv
-                push!(P[w], v)
-            end
-        end
-    end
-    return S, P, σ
-end
-
-function _single_source_dijkstra_path_basic{V}(g::AbstractGraph{V}, s::V, weights::Vector{Float64})
-    S = V[]
-
-    P = Dict{V, Vector{V}}()
-    σ = Dict{V, Float64}()
-    for v in vertices(g)
-        P[v] = V[]
-        σ[v] = 0.0
-    end
-    D = Dict{V, Float64}()
-    σ[s] = 1.0
-
-    seen = Dict{V,Float64}()
-    seen[s] = 0
-    c = 0 # 253
-    Q = (Float64, Int, V, V)[]
-    push!(Q, (0.0, c, s, s)); c += 1
-    while length(Q) > 0
-        (dist, _, pred, v) = pop!(Q)
-        if (v in keys(D)) # 258
-            continue
-        end
-        σ[v] += σ[pred]
-        push!(S,v)
-        D[v] = dist
-        for w in out_neighbors(v,g)
-            wi = vertex_index(w,g)
-            vw_dist = dist + weights[wi] # 264
-            if !(w in keys(D)) && ((!(w in keys(seen))) || (vw_dist < seen[w]))
-                seen[w] = vw_dist
-                push!(Q, (vw_dist, c, v, w)); c += 1
-                σ[w] = 0.0
-                P[w] = [v]
-            elseif vw_dist == seen[w] # 270
-                σ[w] += σ[v]
-                push!(P[w],v)
-            end
-        end
-    end
-    return S, P, σ
-end
-
-
 function _accumulate_basic{V}(
     betweenness::Dict{V, Float64},
-    S::Vector{V},
-    P::Dict{V, Vector{V}},
-    σ::Dict{V, Float64},
-    s::V
+    state::DijkstraStatesWithPred,
+    g::AbstractGraph,
+    si::Integer
     )
-    disps = zeros(Float64,length(σ))
-    dispp = zeros(Int,length(P))
-    for (k,v) in σ
-        disps[k] = v
-    end
-    for (k,v) in P
-        if length(v) > 0
-            dispp[k] = v[1]
-        end
-    end
 
-    println("S = $S, P = $P, σ = $disps, s = $s")
-    δ = Dict{V, Float64}()
-    for i in S
-        δ[i] = 0.0
-    end
+    nv = length(state.parents) # this is the ttl number of vertices
+    δ = zeros(nv)
+    σ = state.pathcounts
+    P = state.predecessors
 
-
-    while length(S) > 0
-        w = pop!(S) # 279
+    # make sure the source index has no parents.
+    P[si] = []
+    # we need to order the source nodes by decreasing distance for this to work.
+    v1 = [1:nv][state.hasparent] # the state.hasparent will fix P[si] = [] when it's merged
+    v2 = state.dists[state.hasparent]
+    S = Int[x[2] for x in sort(collect(zip(v2,v1)), rev=true)]
+    # println("S = $S, P = $P, σ = $σ, si = $si")
+    for w in S
         coeff = (1.0 + δ[w]) / σ[w]
         # println("coeff of $w = $coeff, δ[w] = $(δ[w])")
         # println("*** P[w] = P[$w] = $(P[w])")
         for v in P[w]
-            δ[v] += (σ[v] * coeff)
-            # println("setting δ[$v] to $(δ[v])")
+            vi = vertex_index(v, g)
+            if vi > 0
+                δ[vi] += (σ[vi] * coeff)
+                # println("setting δ[$vi] to $(δ[vi]), δ = $δ")
+            end
         end
-        if w != s
-            betweenness[w] += δ[w]
+        if w != si
+            wvert = g.vertices[w]
+            betweenness[wvert] += δ[w]
         end
     end
-    byvind = zeros(length(betweenness))
-    for (k,v) in betweenness
-        byvind[k] = v
-    end
-    println("betweenness = $byvind")
+    # byvind = zeros(length(betweenness))
+    # for (k,v) in betweenness
+    #     byvind[k] = v
+    # end
+    # println("betweenness = $betweenness")
     return betweenness
 end
 
 function _accumulate_endpoints{V}(
     betweenness::Dict{V, Float64},
-    S::Vector{V},
-    P::Dict{V, Vector{V}},
-    σ::Dict{V, Float64},
-    s::V
+    state::DijkstraStatesWithPred,
+    g::AbstractGraph,
+    si::Integer
     )
 
+    nv = length(state.parents) # this is the ttl number of vertices
+    δ = zeros(nv)
+    σ = state.pathcounts
+    P = state.predecessors
+    v1 = [1:nv][state.hasparent] # the state.hasparent will fix P[si] = [] when it's merged
+    v2 = state.dists[state.hasparent]
+    S = Int[x[2] for x in sort(collect(zip(v2,v1)), rev=true)]
+    s = g.vertices[si]
     betweenness[s] += length(S) - 1    # 289
-    δ = Dict{V, Float64}()
-    for i in S
-        δ[i] = 0.0
-    end
 
-    while length(S) > 0
-        w = pop!(S) # 292
+    for w in S
         coeff = (1.0 + δ[w]) / σ[w]
         for v in P[w]
-            δ[v] += σ[v] * coeff
+            vi = vertex_index(v, g)
+            δ[vi] += σ[vi] * coeff
         end
-        if w != s
-            betweenness[w] += (δ[w] + 1)
+        if w != si
+            wvert = g.vertices[w]
+            betweenness[wvert] += (δ[w] + 1)
         end
     end
     return betweenness
