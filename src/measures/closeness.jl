@@ -9,18 +9,16 @@ function closeness_centrality{V}(
     for ui = 1:num_vertices(g)
         u = g.vertices[ui]
         d = dijkstra_shortest_paths(g,u).dists
-        δ = filter(x->x!=Inf, d)
+        δ = d[!isinf(d)]
         σ = sum(δ)
         l = length(δ) - 1
         if σ > 0
-            closeness[ui] = (l) / σ
+            closeness[ui] = l / σ
 
             if normalized
                 n = l / (nv-1)
                 closeness[ui] *= n
             end
-        else
-            closeness[ui] = 0
         end
     end
     return closeness
