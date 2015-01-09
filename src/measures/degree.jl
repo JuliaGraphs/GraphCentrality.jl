@@ -13,7 +13,7 @@ function _degree_centrality{V}(g::AbstractGraph{V}, gtype::Integer; normalize=tr
            deg = out_degree(v,g)
        end
        s = normalize? (1.0 / (nv - 1.0)) : 1.0
-       println("v = $v")
+    #    println("v = $v")
        c[v] = deg*s
    end
    return c
