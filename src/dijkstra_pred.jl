@@ -60,8 +60,8 @@ function process_neighbors_with_pred!{V,D,Heap,H}(
     parents::Vector{V} = state.parents
     hasparent::Vector{Bool} = state.hasparent
     colormap::Vector{Int} = state.colormap
-    pathcounts::Vector{Int} = state.pathcounts
-    predecessors::Vector{Vector{V}} = state.predecessors
+    pathcounts::Vector{Int} = state.pathcounts              # the # of paths from src to the vertex
+    predecessors::Vector{Vector{V}} = state.predecessors    # the vertex's predecessors
     heap::Heap = state.heap
     hmap::Vector{H} = state.hmap
     dv::D = zero(D)

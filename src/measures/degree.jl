@@ -1,10 +1,8 @@
-using DataStructures
-using StatsBase
-
 function _degree_centrality{V}(g::AbstractGraph{V}, gtype::Integer; normalize=true)
    nv = num_vertices(g)
    c = zeros(nv)
-   for v in vertices(g)
+   for vi in 1:nv
+       v = g.vertices[vi]
        if gtype == 0    # count both in and out degree if appropriate
            deg = out_degree(v,g) + (is_directed(g)? in_degree(v,g) : 0)
        elseif gtype == 1    # count only in degree
@@ -13,8 +11,7 @@ function _degree_centrality{V}(g::AbstractGraph{V}, gtype::Integer; normalize=tr
            deg = out_degree(v,g)
        end
        s = normalize? (1.0 / (nv - 1.0)) : 1.0
-    #    println("v = $v")
-       c[v] = deg*s
+       c[vi] = deg*s
    end
    return c
 end

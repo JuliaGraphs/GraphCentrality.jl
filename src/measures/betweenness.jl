@@ -1,48 +1,46 @@
+using StatsBase
+
+
 function betweenness_centrality{V}(
     g::AbstractGraph{V},
     k::Integer=0;
-    normalized=true,
+    normalize=true,
     endpoints=false,
     weights=Float64[])
 
-    betweenness = Dict{V, Float64}()
-    for v in vertices(g)
-        betweenness[v] = 0.0
-    end
+    nv = num_vertices(g)
+    betweenness = zeros(nv)
     if k == 0
-        nodes = vertices(g)
+        nodes = 1:nv
     else
-        nodes = sample(vertices(g), k, replace=false)   #112
+        nodes = sample(1:nv, k, replace=false)   #112
     end
-    for s in nodes
+    for si in nodes
+        s = g.vertices[si]
         if length(weights) == 0
             state = dijkstra_predecessor_and_distance(g, s)
         else
             state = dijkstra_predecessor_and_distance(g, weights, s)
         end
         if endpoints            # 120
-            betweenness = _accumulate_endpoints(betweenness, state, g, vertex_index(s,g))
+            betweenness = _accumulate_endpoints(betweenness, state, g, si)
         else
-            betweenness = _accumulate_basic(betweenness, state, g, vertex_index(s,g))
+            betweenness = _accumulate_basic(betweenness, state, g, si)
         end
     end
-    betweenness = _rescale(betweenness, num_vertices(g),
-                           normalized,
+    betweenness = _rescale(betweenness, nv,
+                           normalize,
                            is_directed(g),
                            k)
 
-    byvind = zeros(num_vertices(g))
-    for (k,v) in betweenness
-        byvind[vertex_index(k,g)] = v
-    end
-    return byvind
+    return betweenness
 end
 
 
 function _accumulate_basic{V}(
-    betweenness::Dict{V, Float64},
+    betweenness::Vector{Float64},
     state::DijkstraStatesWithPred,
-    g::AbstractGraph,
+    g::AbstractGraph{V},
     si::Integer
     )
 
@@ -70,22 +68,16 @@ function _accumulate_basic{V}(
             end
         end
         if w != si
-            wvert = g.vertices[w]
-            betweenness[wvert] += δ[w]
+            betweenness[w] += δ[w]
         end
     end
-    # byvind = zeros(length(betweenness))
-    # for (k,v) in betweenness
-    #     byvind[k] = v
-    # end
-    # println("betweenness = $betweenness")
     return betweenness
 end
 
 function _accumulate_endpoints{V}(
-    betweenness::Dict{V, Float64},
+    betweenness::Vector{Float64},
     state::DijkstraStatesWithPred,
-    g::AbstractGraph,
+    g::AbstractGraph{V},
     si::Integer
     )
 
@@ -106,15 +98,14 @@ function _accumulate_endpoints{V}(
             δ[vi] += σ[vi] * coeff
         end
         if w != si
-            wvert = g.vertices[w]
-            betweenness[wvert] += (δ[w] + 1)
+            betweenness[w] += (δ[w] + 1)
         end
     end
     return betweenness
 end
 
-function _rescale{V}(betweenness::Dict{V, Float64}, n::Int, normalized::Bool, directed::Bool, k::Int)
-    if normalized
+function _rescale(betweenness::Vector{Float64}, n::Int, normalize::Bool, directed::Bool, k::Int)
+    if normalize
         if n <= 2
             do_scale = false
         else
@@ -133,7 +124,7 @@ function _rescale{V}(betweenness::Dict{V, Float64}, n::Int, normalized::Bool, di
         if k > 0
             scale = scale * n / k   #331
         end
-        for v in keys(betweenness)
+        for v = 1:length(betweenness)
             betweenness[v] *= scale
         end
     end

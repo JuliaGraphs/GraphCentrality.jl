@@ -1,6 +1,6 @@
 function closeness_centrality{V}(
     g::AbstractGraph{V};
-    normalized=true,
+    normalize=true,
     weights=Float64[])
 
     nv = num_vertices(g)
@@ -15,7 +15,7 @@ function closeness_centrality{V}(
         if σ > 0
             closeness[ui] = l / σ
 
-            if normalized
+            if normalize
                 n = l / (nv-1)
                 closeness[ui] *= n
             end
