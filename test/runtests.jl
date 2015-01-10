@@ -2,6 +2,7 @@ using Centrality
 using Base.Test
 
 tests = [
+    "randgraphs",
     "measures/degree",
     "measures/betweenness",
     "measures/closeness",

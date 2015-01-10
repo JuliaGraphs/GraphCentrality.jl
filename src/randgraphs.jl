@@ -5,11 +5,11 @@ immutable REdge
     dst::Integer
 end
 
-function randgraph(nv::Integer, ne::Integer=int(0.2*(nv^2)), f::AbstractString="graph-$nv-$ne.csv")
+
+function randgraph(nv::Integer, ne::Integer=int(0.2*(nv^2)), io::IO=STDOUT)
     redges = Set(REdge[])
-    f = open(f,"w")
     line = string(nv,"\n")
-    write(f,line)
+    write(io,line)
     i = 1
     while i <= ne
         source = rand(1:nv)
@@ -18,12 +18,25 @@ function randgraph(nv::Integer, ne::Integer=int(0.2*(nv^2)), f::AbstractString="
         if (source != dest) && !(in(e,redges))
             i+= 1
             line = string(source,", ", dest,"\n")
-            write(f,line)
+            write(io,line)
             push!(redges,e)
         end
     end
-    close(f)
+    return (nv, ne)
 end
+
+
+function randgraph(nv::Integer, ne::Integer=int(0.2*(nv^2)), f::AbstractString="graph-$nv-$ne.csv")
+    f = open(f,"w")
+    r = randgraph(nv, ne, f)
+    close(f)
+    return r
+end
+
+
+randgraph(nv::Integer, ne::Integer=int(0.2*(nv^2))) =
+    randgraph(nv, ne, "graph-$nv-$ne.csv")
+
 
 function readgraph(f::AbstractString)
     f = open(f,"r")

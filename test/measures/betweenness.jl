@@ -1,6 +1,6 @@
 # betweeenness centrality - values taken from networkx
 g = Centrality.readgraph("testdata/graph-50-500.csv")
-h = graph(["a","b","c","d"],[], is_directed=false)
+h = graph(["a","b","c","d"],Edge{ASCIIString}[], is_directed=false)
 add_edge!(h,"a","b"); add_edge!(h,"b","c"); add_edge!(h,"a","c"); add_edge!(h,"c","d")
 
 c = Centrality.readcentrality("testdata/graph-50-500-bc.txt")

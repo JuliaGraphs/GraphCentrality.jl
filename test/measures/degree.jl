@@ -1,5 +1,5 @@
 using Graphs
-h = graph(["a","b","c","d"],[])
+h = graph(["a","b","c","d"],Edge{ASCIIString}[])
 add_edge!(h,"a","b"); add_edge!(h,"b","c"); add_edge!(h,"a","c"); add_edge!(h,"c","d")
 
 @test degree_centrality(h, normalize=false) == [2.0, 2.0, 3.0, 1.0]
