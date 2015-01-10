@@ -2,7 +2,14 @@ module Centrality
     using Graphs
     using DataStructures
     using StatsBase
+    using Compat
 
+    g = simple_graph(2)
+    if !applicable(dijkstra_shortest_paths, g, 1)
+        import Graphs.dijkstra_shortest_paths
+        dijkstra_shortest_paths{V}(graph::AbstractGraph{V}, s::V) =
+            dijkstra_shortest_paths(graph, ones(num_edges(graph)), s)
+    end
     export
         dijkstra_predecessor_and_distance!, dijkstra_predecessor_and_distance,
 

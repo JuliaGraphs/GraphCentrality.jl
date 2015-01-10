@@ -1,6 +1,3 @@
-using StatsBase
-
-
 function betweenness_centrality{V}(
     g::AbstractGraph{V},
     k::Integer=0;
