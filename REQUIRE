@@ -2,3 +2,4 @@ Compat
 julia 0.3
 Graphs 0.5
 StatsBase 0.6
+DataStructures 0.3
