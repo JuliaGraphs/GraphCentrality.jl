@@ -16,7 +16,7 @@ Optimized, performance-driven centrality measures on [Graphs.jl](https://github.
 ##TODO
 - [X] Finish betweenness_centrality with dijkstra
 - [X] Optimize code
-- [ ] TESTS!
+- [X] TESTS!
 - [ ] New centrality measures:
  - [X] Closeness
  - [ ] Load
