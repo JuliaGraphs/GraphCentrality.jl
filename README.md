@@ -1,6 +1,7 @@
 # Centrality.jl
 
 [![Build Status](https://travis-ci.org/sbromberger/Centrality.jl.svg?branch=master)](https://travis-ci.org/sbromberger/Centrality.jl)
+[![Coverage Status](https://img.shields.io/coveralls/sbromberger/Centrality.jl.svg)](https://coveralls.io/r/sbromberger/Centrality.jl?branch=master)
 
 Optimized, performance-driven centrality measures on [Graphs.jl](https://github.com/JuliaLang/Graphs.jl) graphs.
 
