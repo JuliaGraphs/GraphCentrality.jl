@@ -1,4 +1,4 @@
-module Centrality
+module GraphCentrality
     using Graphs
     using DataStructures
     using StatsBase

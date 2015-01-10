@@ -1,4 +1,4 @@
-using Centrality
+using GraphCentrality
 using Base.Test
 
 tests = [
@@ -10,7 +10,7 @@ tests = [
 
 
 for t in tests
-    tp = joinpath(Pkg.dir("Centrality"),"test","$(t).jl")
+    tp = joinpath(Pkg.dir("GraphCentrality"),"test","$(t).jl")
     println("running $(tp) ...")
     include(tp)
 end

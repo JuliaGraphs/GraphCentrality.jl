@@ -1,4 +1,4 @@
-The Centrality.jl package is licensed under the Simplified "2-clause" BSD License:
+The GraphCentrality.jl package is licensed under the Simplified "2-clause" BSD License:
 
 > Copyright (c) 2015: Seth Bromberger.
 >
@@ -24,7 +24,7 @@ The Centrality.jl package is licensed under the Simplified "2-clause" BSD Licens
 > (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 > OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Portions of the Centrality.jl package are derived from NetworkX, which
+Portions of the GraphCentrality.jl package are derived from NetworkX, which
 is licensed under the BSD License as follows:
 
 > NetworkX Python library and are BSD Licensed as follows:
