@@ -6,6 +6,9 @@
 Optimized, performance-driven centrality measures on [Graphs.jl](https://github.com/JuliaLang/Graphs.jl) graphs.
 
 
+#### Please note that this package is not actively maintained. Active development of centrality measures has been moved to the [LightGraphs.jl](https://github.com/JuliaGraphs/LightGraphs.jl) project. 
+
+
 | Centrality Test | (order, size)   | GraphCentrality.jl   | NetworkX      | Improvement |
 |:-------------:  |:-------------:  | -------------:       | -------------:| ----------: |
 |degree           | (1e6, 1e7)      | 0.30s                | 30.7s         | 99%         |
@@ -13,7 +16,7 @@ Optimized, performance-driven centrality measures on [Graphs.jl](https://github.
 |closeness        | (1000, 80000)   | 2.18s                | 12.1s         | 77%         |
 
 
-##TODO
+#### TODO
 - [X] Finish betweenness_centrality with dijkstra
 - [X] Optimize code
 - [X] TESTS!
